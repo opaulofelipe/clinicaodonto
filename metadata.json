@@ -1,0 +1,8 @@
+{
+  "name": "Dr. Rafael Mendes — Odontologia de Alta Precisão",
+  "description": "Clínica odontológica de excelência no Rio de Janeiro liderada pelo Dr. Rafael Mendes (UFRJ), especialista em Implantodontia, Estética Dental e Reabilitação Oral humanizada.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
