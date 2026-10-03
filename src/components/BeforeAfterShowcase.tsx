@@ -24,8 +24,8 @@ const CASES: CaseStudy[] = [
     category: 'Estética Dental',
     title: 'Lentes de Contato & Harmonização do Sorriso',
     patientProfile: 'Mulher, 32 anos · Barra da Tijuca',
-    beforeImage: '/cases/lentes-antes.png',
-    afterImage: '/cases/lentes-depois.png',
+    beforeImage: `${import.meta.env.BASE_URL}cases/lentes-antes.png`,
+    afterImage: `${import.meta.env.BASE_URL}cases/lentes-depois.png`,
     details: {
       initialShade: 'Escala Vita A3.5 (amarelamento e desgaste incisal)',
       finalShade: 'Cerâmica Feldspática BL2 (luminosidade natural)',
@@ -39,8 +39,8 @@ const CASES: CaseStudy[] = [
     category: 'Clareamento & Prevenção',
     title: 'Clareamento Combinado com Protocolo Anti-Sensibilidade',
     patientProfile: 'Homem, 38 anos · Ipanema',
-    beforeImage: '/cases/clareamento-antes.png',
-    afterImage: '/cases/clareamento-depois.png',
+    beforeImage: `${import.meta.env.BASE_URL}cases/clareamento-antes.png`,
+    afterImage: `${import.meta.env.BASE_URL}cases/clareamento-depois.png`,
     details: {
       initialShade: 'Escala Vita A3 (manchas de café e tabaco)',
       finalShade: 'Escala Vita B1 (clareamento uniforme)',
@@ -54,8 +54,8 @@ const CASES: CaseStudy[] = [
     category: 'Implantodontia',
     title: 'Implante Unitário com Cirurgia Guiada sem Cortes',
     patientProfile: 'Mulher, 45 anos · Leblon',
-    beforeImage: '/cases/implante-antes.png',
-    afterImage: '/cases/implante-depois.png',
+    beforeImage: `${import.meta.env.BASE_URL}cases/implante-antes.png`,
+    afterImage: `${import.meta.env.BASE_URL}cases/implante-depois.png`,
     details: {
       initialShade: 'Ausência do incisivo lateral com reabsorção tecidual',
       finalShade: 'Coroa cerâmica personalizada idêntica aos dentes vizinhos',
