@@ -22,10 +22,10 @@ const CASES: CaseStudy[] = [
   {
     id: 'lentes-1',
     category: 'Estética Dental',
-    title: 'Facetas Cerâmicas & Harmonização do Sorriso',
+    title: 'Lentes de Contato & Harmonização do Sorriso',
     patientProfile: 'Mulher, 32 anos · Barra da Tijuca',
-    beforeImage: 'https://images.unsplash.com/photo-1588776814546-daab30f310ce?auto=format&fit=crop&w=1000&q=85',
-    afterImage: 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&w=1000&q=85',
+    beforeImage: '/cases/lentes-antes.png',
+    afterImage: '/cases/lentes-depois.png',
     details: {
       initialShade: 'Escala Vita A3.5 (amarelamento e desgaste incisal)',
       finalShade: 'Cerâmica Feldspática BL2 (luminosidade natural)',
@@ -39,8 +39,8 @@ const CASES: CaseStudy[] = [
     category: 'Clareamento & Prevenção',
     title: 'Clareamento Combinado com Protocolo Anti-Sensibilidade',
     patientProfile: 'Homem, 38 anos · Ipanema',
-    beforeImage: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=1000&q=85',
-    afterImage: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=1000&q=85',
+    beforeImage: '/cases/clareamento-antes.png',
+    afterImage: '/cases/clareamento-depois.png',
     details: {
       initialShade: 'Escala Vita A3 (manchas de café e tabaco)',
       finalShade: 'Escala Vita B1 (clareamento uniforme)',
@@ -54,8 +54,8 @@ const CASES: CaseStudy[] = [
     category: 'Implantodontia',
     title: 'Implante Unitário com Cirurgia Guiada sem Cortes',
     patientProfile: 'Mulher, 45 anos · Leblon',
-    beforeImage: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&w=1000&q=85',
-    afterImage: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=1000&q=85',
+    beforeImage: '/cases/implante-antes.png',
+    afterImage: '/cases/implante-depois.png',
     details: {
       initialShade: 'Ausência do incisivo lateral com reabsorção tecidual',
       finalShade: 'Coroa cerâmica personalizada idêntica aos dentes vizinhos',
@@ -74,22 +74,33 @@ export const BeforeAfterShowcase: React.FC = () => {
 
   const activeCase = CASES[activeCaseIndex];
 
-  const handleMove = useCallback((clientX: number) => {
+  const updatePosition = useCallback((clientX: number) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const x = clientX - rect.left;
-    const clamped = Math.max(5, Math.min(95, (x / rect.width) * 100));
+    const percentage = (x / rect.width) * 100;
+    const clamped = Math.max(0, Math.min(100, Math.round(percentage)));
     setSliderPos(clamped);
   }, []);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    handleMove(e.clientX);
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    setIsDragging(true);
+    e.currentTarget.setPointerCapture(e.pointerId);
+    updatePosition(e.clientX);
   };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!isDragging) return;
-    handleMove(e.touches[0].clientX);
+    updatePosition(e.clientX);
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (isDragging) {
+      setIsDragging(false);
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {}
+    }
   };
 
   return (
@@ -105,11 +116,11 @@ export const BeforeAfterShowcase: React.FC = () => {
               Antes & Depois: Precisão milimétrica em cada detalhe.
             </h2>
             <p className="mt-3 text-base text-slate-600 leading-relaxed">
-              Arraste o cursor interativo para comparar a condição inicial e o resultado pós-tratamento obtido pelo Dr. Rafael Mendes.
+              Arraste o cursor interativo ou toque na imagem para comparar a condição inicial e o resultado pós-tratamento obtido pelo Dr. Rafael Mendes.
             </p>
           </div>
 
-          {/* Interactive Case Selector Tabs (Buttons with click handlers per skill rule) */}
+          {/* Interactive Case Selector Tabs */}
           <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl overflow-x-auto shrink-0">
             {CASES.map((item, idx) => (
               <button
@@ -120,7 +131,7 @@ export const BeforeAfterShowcase: React.FC = () => {
                 }}
                 className={`px-3.5 py-2 text-xs font-medium rounded-lg transition-colors whitespace-nowrap cursor-pointer ${
                   activeCaseIndex === idx
-                    ? 'bg-white text-slate-900 shadow-xs'
+                    ? 'bg-white text-slate-900 shadow-xs font-semibold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -134,19 +145,18 @@ export const BeforeAfterShowcase: React.FC = () => {
         <div className="grid lg:grid-cols-12 gap-8 items-center">
           {/* Interactive Before/After Comparison Carrier */}
           <div className="lg:col-span-7">
+            {/* Draggable container with touch-none for flawless mobile and desktop dragging */}
             <div
               ref={containerRef}
-              onMouseDown={() => setIsDragging(true)}
-              onMouseUp={() => setIsDragging(false)}
-              onMouseLeave={() => setIsDragging(false)}
-              onMouseMove={handleMouseMove}
-              onTouchStart={() => setIsDragging(true)}
-              onTouchEnd={() => setIsDragging(false)}
-              onTouchMove={handleTouchMove}
-              className="relative w-full h-[360px] sm:h-[440px] rounded-2xl overflow-hidden shadow-xl select-none cursor-ew-resize border border-slate-200/80 bg-slate-900"
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerUp}
+              className="relative w-full h-[360px] sm:h-[440px] rounded-2xl overflow-hidden shadow-xl select-none cursor-ew-resize border border-slate-200/90 bg-slate-900 touch-none"
+              style={{ touchAction: 'none' }}
             >
               {/* After Image (Background layer) */}
-              <div className="absolute inset-0 w-full h-full">
+              <div className="absolute inset-0 w-full h-full pointer-events-none">
                 <ImageWithFallback
                   src={activeCase.afterImage}
                   alt={`Resultado final: ${activeCase.title}`}
@@ -161,7 +171,7 @@ export const BeforeAfterShowcase: React.FC = () => {
 
               {/* Before Image (Clipped layer) */}
               <div
-                className="absolute inset-y-0 left-0 overflow-hidden"
+                className="absolute inset-y-0 left-0 overflow-hidden pointer-events-none"
                 style={{ width: `${sliderPos}%` }}
               >
                 <div
@@ -171,11 +181,11 @@ export const BeforeAfterShowcase: React.FC = () => {
                   <ImageWithFallback
                     src={activeCase.beforeImage}
                     alt={`Condição inicial: ${activeCase.title}`}
-                    className="w-full h-full object-cover grayscale-[20%]"
+                    className="w-full h-full object-cover"
                     fallbackTitle="Condição Inicial"
                     fallbackSubtitle="Antes do procedimento"
                   />
-                  <span className="absolute top-4 left-4 text-[11px] font-semibold tracking-wider uppercase bg-slate-900/80 backdrop-blur-xs text-white px-2.5 py-1 rounded-md shadow-xs">
+                  <span className="absolute top-4 left-4 text-[11px] font-semibold tracking-wider uppercase bg-slate-900/85 backdrop-blur-xs text-white px-2.5 py-1 rounded-md shadow-xs">
                     Antes (Inicial)
                   </span>
                 </div>
@@ -183,20 +193,72 @@ export const BeforeAfterShowcase: React.FC = () => {
 
               {/* Slider Divider Line */}
               <div
-                className="absolute inset-y-0 w-0.5 bg-white shadow-[0_0_10px_rgba(0,0,0,0.5)] z-20 pointer-events-none"
+                className="absolute inset-y-0 w-1 bg-white shadow-[0_0_12px_rgba(0,0,0,0.6)] z-20 pointer-events-none"
                 style={{ left: `${sliderPos}%` }}
               >
-                {/* Center handle badge */}
-                <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-white text-slate-800 shadow-lg flex items-center justify-center border border-slate-200">
-                  <SlidersHorizontal className="w-4 h-4 text-teal-800" />
+                {/* Center handle badge (touch target >= 44px) */}
+                <div className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white text-slate-900 shadow-xl flex items-center justify-center border-2 border-teal-800 transition-transform ${isDragging ? 'scale-110 shadow-2xl ring-4 ring-teal-600/30' : ''}`}>
+                  <div className="flex items-center gap-1 text-teal-900">
+                    <span className="text-[10px] font-bold">◀</span>
+                    <SlidersHorizontal className="w-4 h-4 text-teal-800 shrink-0" />
+                    <span className="text-[10px] font-bold">▶</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Slider hint */}
-            <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
-              <span>← Arraste para a esquerda (ver resultado)</span>
-              <span>Arraste para a direita (ver inicial) →</span>
+            {/* Quick-Access Slider Range Control & Quick View Buttons */}
+            <div className="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200/80 space-y-3">
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-semibold text-slate-500 whitespace-nowrap">Antes</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={sliderPos}
+                  onChange={(e) => setSliderPos(Number(e.target.value))}
+                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-800"
+                  aria-label="Controle de visualização Antes e Depois"
+                />
+                <span className="text-xs font-semibold text-slate-500 whitespace-nowrap">Depois</span>
+              </div>
+
+              {/* Quick Jump Buttons */}
+              <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-200/60 text-xs">
+                <span className="text-slate-500 hidden sm:inline">Visualização rápida:</span>
+                <div className="flex items-center gap-1.5 w-full sm:w-auto justify-between sm:justify-end">
+                  <button
+                    onClick={() => setSliderPos(100)}
+                    className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
+                      sliderPos === 100
+                        ? 'bg-slate-900 text-white border-slate-900'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    100% Antes
+                  </button>
+                  <button
+                    onClick={() => setSliderPos(50)}
+                    className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
+                      sliderPos === 50
+                        ? 'bg-teal-900 text-white border-teal-900'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    50% Dividido
+                  </button>
+                  <button
+                    onClick={() => setSliderPos(0)}
+                    className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
+                      sliderPos === 0
+                        ? 'bg-slate-900 text-white border-slate-900'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    100% Depois
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
